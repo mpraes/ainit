@@ -4,20 +4,12 @@
 
 `ainit` is an interactive CLI tool that bootstraps modular Python projects tailored for AI Agents using **`uv`**, pre-configured for modern LLM frameworks, vector stores, and observability tooling.
 
-## 📦 Quick Start
-
-Run directly with `uvx` without installing:
+## Quick Start
 
 ```bash
-uvx ainit init my_project
-```
-
-Or install globally via `pip`:
-
-```bash
-pip install ainit
+pipx install ai-init
+# or: uv tool install ai-init
 ainit my_project
-```
 
 ## ✨ Features
 

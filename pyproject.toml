@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ainit"
-version = "0.1.0"
+name = "ai-init"
+version = "0.1.2"
 description = "A CLI tool to scaffold production-ready AI Agent projects in seconds."
 readme = "README.md"
 authors = [
