@@ -1,36 +1,85 @@
+import sys
+
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from ainit.ui import print_banner, prompt_choices
-from ainit.generator import build_project
 
-app = typer.Typer(name="ainit", help="CLI para criar projetos de agentes com UV")
+from ainit.generator import build_project
+from ainit.ui import print_banner, prompt_choices
+
+cli = typer.Typer(
+    name="ainit",
+    help="CLI to scaffold AI agent projects with UV",
+)
 console = Console()
 
-@app.command()
-def init(
-    folder: str = typer.Argument("meu_projeto", help="Nome da pasta do projeto"),
-):
-    """Inicia o menu interativo para criar a estrutura do projeto."""
+_RESERVED = {
+    "init",
+    "--help",
+    "-h",
+    "--install-completion",
+    "--show-completion",
+}
+
+
+def _run_init(folder: str) -> None:
     print_banner()
-    
+
     choices = prompt_choices()
 
-    console.print(f"\n[bold green]🛠️ Criando o projeto em:[/bold green] [bold yellow]./{folder}[/bold yellow]\n")
+    console.print(
+        f"\n[bold green]🛠️ Creating project in:[/bold green] "
+        f"[bold yellow]./{folder}[/bold yellow]\n"
+    )
 
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         transient=True,
     ) as progress:
-        progress.add_task(description="Instalando pacotes e configurando projeto...", total=None)
+        progress.add_task(
+            description="Installing packages and configuring project...",
+            total=None,
+        )
         build_project(folder, choices)
 
-    console.print("[bold green]✨ Projeto criado com sucesso![/bold green]\n")
+    console.print("[bold green]✨ Project created successfully![/bold green]\n")
     console.print(f"1. [cyan]cd {folder}[/cyan]")
-    console.print("2. Preencha as chaves no arquivo [yellow].env[/yellow]")
-    console.print("3. Execute os testes: [cyan]uv run pytest[/cyan]")
-    console.print("4. Teste a execução: [cyan]uv run python main.py[/cyan]\n")
+    console.print("2. Fill in the keys in the [yellow].env[/yellow] file")
+    console.print("3. Run the tests: [cyan]uv run pytest[/cyan]")
+    console.print("4. Try it out: [cyan]uv run python main.py[/cyan]\n")
+
+
+def _safe_run(folder: str) -> None:
+    try:
+        _run_init(folder)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Operation cancelled.[/yellow]")
+        raise typer.Exit(code=130) from None
+
+
+@cli.callback()
+def _root() -> None:
+    """CLI to scaffold AI agent projects with UV."""
+
+
+@cli.command(name="init")
+def init(
+    folder: str = typer.Argument("my_project", help="Project folder name"),
+) -> None:
+    """Start the interactive menu to create the project structure."""
+    _safe_run(folder)
+
+
+def app() -> None:
+    """Entry point: accepts `ainit <folder>` and `ainit init <folder>`."""
+    args = sys.argv[1:]
+    if not args:
+        sys.argv.append("init")
+    elif args[0] not in _RESERVED:
+        sys.argv.insert(1, "init")
+    cli()
+
 
 if __name__ == "__main__":
     app()
