@@ -8,12 +8,12 @@ version = "0.1.0"
 description = "A CLI tool to scaffold production-ready AI Agent projects in seconds."
 readme = "README.md"
 authors = [
-    { name = "Seu Nome", email = "seu.email@exemplo.com" }
+    { name = "mpraes", email = "renan.de.moraes777@gmail.com" }
 ]
-license = { text = "MIT" }
+license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
-    "typer[all]>=0.12.0",
+    "typer>=0.12.0",
     "rich>=13.7.0",
     "questionary>=2.0.0",
     "pydantic>=2.0.0",

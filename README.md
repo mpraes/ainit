@@ -9,14 +9,14 @@
 Run directly with `uvx` without installing:
 
 ```bash
-uvx ainit init meu_projeto
+uvx ainit init my_project
 ```
 
 Or install globally via `pip`:
 
 ```bash
 pip install ainit
-ainit meu_projeto
+ainit my_project
 ```
 
 ## ✨ Features
@@ -30,4 +30,4 @@ ainit meu_projeto
 
 ## 📄 License
 
-MIT © Seu Nome
+MIT © mpraes
