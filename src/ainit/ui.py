@@ -6,10 +6,18 @@ from rich.text import Text
 console = Console()
 
 
+BANNER = r"""
+__ _   _ _ __   (*) | |_   _| | |_
+ / _` | | | '_ \  | | | __| | | | __|
+| (_| | | | | | | | | | |_  | | | |_
+ \__,_| |_|_| |_| |_|  \__| |_|  \__|
+"""
+
+
 def print_banner() -> None:
-    title = Text("ainit", style="bold cyan")
+    logo = Text(BANNER.strip("\n"), style="bold cyan")
     subtitle = Text("Scaffold AI Agent projects in seconds", style="dim")
-    console.print(Panel.fit(Text.assemble(title, "\n", subtitle), border_style="cyan"))
+    console.print(Panel.fit(Text.assemble(logo, "\n", subtitle), border_style="cyan"))
 
 
 def prompt_choices() -> dict:
