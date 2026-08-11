@@ -16,9 +16,9 @@
 [![Powered by uv](https://img.shields.io/badge/powered%20by-uv-de5b8a?style=for-the-badge&logo=astral&logoColor=white)](https://github.com/astral-sh/uv)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-*An interactive, ultra-fast CLI tool that bootstraps modular Python projects for AI Agents using **[`uv`](https://github.com/astral-sh/uv)**, pre-configured with modern LLM frameworks, vector stores, and observability tooling.*
+*An interactive CLI that bootstraps modular Python projects for AI agents with [`uv`](https://github.com/astral-sh/uv) — frameworks, providers, tests, lint, type-check, and agent rules ready on day one.*
 
-[Quick Start](#-quick-start) • [Features](#-features) • [Architecture](#-generated-architecture) • [Contributing](#-contributing) • [License](#-license)
+[Quick Start](#quick-start) · [Options](#scaffold-options) · [Features](#features) · [Architecture](#generated-architecture) · [Developing ainit](#developing-ainit) · [Contributing](#contributing) · [License](#license)
 
 </div>
 
@@ -26,30 +26,32 @@
 
 ## Quick Start
 
-You don't even need to install `ainit` globally. Run it directly with `uvx`:
+Run without a global install:
 
 ```bash
 uvx --from ai-init ainit my_project
 ```
 
-Or install it as a global CLI tool using `uv` or `pipx`:
+Or install the CLI:
 
 ```bash
-# Using uv (Recommended)
+# Recommended
 uv tool install ai-init
 
-# Or using pipx
+# Or
 pipx install ai-init
 
-# Then scaffold your project anywhere
 ainit my_project
+# equivalent: ainit init my_project
 ```
+
+Requires Python **3.10+** and [`uv`](https://docs.astral.sh/uv/) on your `PATH` (the scaffold uses `uv init` / `uv add`).
 
 ---
 
 ## Interactive CLI Experience
 
-When you run `ainit`, an interactive menu guides you through customizing your AI Agent stack:
+`ainit` walks you through the stack, then creates the project:
 
 ```text
 ╭───────────────────────────────────────╮
@@ -61,10 +63,10 @@ When you run `ainit`, an interactive menu guides you through customizing your AI
 │ ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝        │
 │ Scaffold AI Agent projects in seconds │
 ╰───────────────────────────────────────╯
-? Framework: PydanticAI
-? LLM Provider: DeepSeek
-? Storage / Vector DB: ChromaDB
-? Observability: OpenTelemetry
+? Framework: LangGraph
+? LLM Provider: Gemini
+? Storage / Vector DB: None
+? Observability: None
 ? Test runner: Pytest
 ? Linter/formatter: Ruff
 ? Type check config: None
@@ -80,111 +82,145 @@ When you run `ainit`, an interactive menu guides you through customizing your AI
 4. Try it out: uv run python main.py
 ```
 
+Defaults: **Pytest**, **Ruff**, type-check **None**, agent rules **All**.
+
+---
+
+## Scaffold Options
+
+| Prompt | Choices |
+| --- | --- |
+| **Framework** | LangChain, LangGraph, Deep Agents, CrewAI, PydanticAI, Microsoft Agent Framework, LlamaIndex, Google ADK, OpenAI Agents SDK, **None** |
+| **LLM Provider** | OpenAI, Anthropic, Groq, DeepSeek, Gemini, Multi-Provider |
+| **Storage / Vector DB** | Qdrant, PostgreSQL, Redis, ChromaDB, Neo4j, None |
+| **Observability** | LangSmith, Arize, Loguru, OpenTelemetry, None |
+| **Test runner** | Pytest *(default)*, unittest |
+| **Linter/formatter** | Ruff *(default)*, None |
+| **Type check** | None *(default)*, Pyright (Pylance-compatible) |
+| **Agent rules** | All *(default)*, AGENTS.md, CLAUDE.md, .cursorrules, None |
+
+### What gets installed
+
+- **Framework / provider**: matching PyPI packages via `uv add` (LangChain adapters only for LangChain / LangGraph / Deep Agents).
+- **Storage packages today**: Qdrant → `qdrant-client`; PostgreSQL → `psycopg2-binary`, `pgvector`, `sqlalchemy`; Redis → `redis`. ChromaDB / Neo4j are selectable for project intent; wire-up packages can be extended later.
+- **Observability packages today**: LangSmith, Arize Phoenix, Loguru. OpenTelemetry is selectable; package wiring can be extended later.
+- **Ruff**: `uv add --dev ruff` + `[tool.ruff]` in `pyproject.toml`.
+- **Pyright**: `uv add --dev basedpyright` + `[tool.pyright]` (Pylance reads the same config).
+- **Agent rules**: markdown/rules files teaching agents to use `uv` / `uv run` (never `pip`), plus the chosen test/lint commands.
+- **`.env`**: provider key placeholders (`OPENAI_API_KEY`, `GOOGLE_API_KEY`, `DEEPSEEK_API_KEY`, etc.).
+
 ---
 
 ## Features
 
-- **Blazing Fast Setup**: Built on top of [`uv`](https://github.com/astral-sh/uv) for instant package resolution and project initialization.
-- **Modern Framework Support**:
-  - LangChain, LangGraph, Deep Agents
-  - CrewAI, PydanticAI
-  - Microsoft Agent Framework, LlamaIndex, Google ADK
-  - OpenAI Agents SDK
-  - **None** — direct SDK / no agent framework
-- **Multiple LLM Providers**: OpenAI, Anthropic (Claude), Groq, DeepSeek, Gemini, or Multi-Provider setups.
-- **Storage & Vector DB Integrations**:
-  - Qdrant, PostgreSQL + PGVector, Redis, ChromaDB, Neo4j, or SQLite
-  - Automatically generates `docker-compose.yml` for required database containers
-- **Observability & Logging**: Pre-configured setup for LangSmith, Arize Phoenix, Loguru, or OpenTelemetry.
-- **Dev tooling on day one**:
-  - **Pytest** or **unittest** smoke tests
-  - Optional **Ruff** (`check` + `format`) with `[tool.ruff]` already in `pyproject.toml`
-  - Optional **Pyright** config (Pylance-compatible) via `basedpyright`
-  - Optional agent rules: `AGENTS.md`, `CLAUDE.md`, and/or `.cursorrules` (uv-first: never `pip`)
-- **Built-in Smoke Tests & Entry Point**:
-  - Pre-written `main.py` ready for testing LLM calls
-  - Included smoke suite in `tests/test_smoke.py` to verify environment and dependencies out of the box
+- **uv-native scaffold** — `uv init` + `uv add` / `uv add --dev`
+- **Broad agent framework menu** — including a pure SDK path with **None**
+- **Providers** — OpenAI, Anthropic, Groq, DeepSeek, Gemini, Multi-Provider
+- **Day-one tooling** — Pytest or unittest smoke tests; optional Ruff and Pyright
+- **Agent-ready docs** — optional `AGENTS.md`, `CLAUDE.md`, `.cursorrules`
+- **Modular layout** — `src/{agent,tools,models,prompts,storage,utils,api}` + `tests/`
 
 ---
 
 ## Generated Architecture
 
-Projects generated by `ainit` follow a clean, modular structure ready for production:
-
 ```text
 my_project/
-├── .env                  # Pre-populated with selected provider keys
+├── .env                  # Provider key placeholders
 ├── .gitignore
-├── AGENTS.md             # Optional — Cursor agent rules (uv / ruff / tests)
-├── CLAUDE.md             # Optional — Claude Code rules
-├── .cursorrules          # Optional — legacy Cursor rules
-├── docker-compose.yml    # Generated conditionally based on storage choice
-├── pyproject.toml        # Managed via uv (+ ruff/pyright tool config when selected)
-├── main.py               # Quick test runner for your LLM setup
+├── AGENTS.md             # Optional (Cursor)
+├── CLAUDE.md             # Optional (Claude Code)
+├── .cursorrules          # Optional
+├── pyproject.toml        # uv-managed (+ ruff/pyright when selected)
+├── main.py               # Entry point
 ├── src/
-│   ├── agent/            # Agent state, executor, and core logic
-│   ├── api/              # FastAPI / HTTP endpoints and schemas
-│   ├── models/           # LLM factories (src/models/llm.py)
-│   ├── prompts/          # System prompts and templates
-│   ├── storage/          # Memory and vector store interfaces
-│   ├── tools/            # Custom agent tools and functions
-│   └── utils/            # Helper functions and logger setup
+│   ├── agent/
+│   ├── api/
+│   ├── models/llm.py     # Stub LLM factory
+│   ├── prompts/
+│   ├── storage/
+│   ├── tools/
+│   └── utils/
 └── tests/
-    └── test_smoke.py     # Out-of-the-box smoke suite (pytest or unittest)
+    └── test_smoke.py     # Pytest or unittest
 ```
 
 ---
 
 ## Post-Setup Workflow
 
-Once your project is created:
+```bash
+cd my_project
+# edit .env with real API keys
+```
 
-1. **Navigate to the directory**:
+**Tests** (depends on what you chose):
 
-   ```bash
-   cd my_project
-   ```
+```bash
+uv run pytest
+# or
+uv run python -m unittest
+```
 
-2. **Start Docker services** *(if you selected a database like Qdrant/Postgres/Redis)*:
+**Lint / format** (if Ruff was selected):
 
-   ```bash
-   docker compose up -d
-   ```
+```bash
+uv run ruff check .
+uv run ruff format .
+```
 
-3. **Add your API Keys** in the `.env` file:
+**Type check** (if Pyright was selected):
 
-   ```env
-   DEEPSEEK_API_KEY=your_actual_key_here
-   ```
+```bash
+uv run basedpyright
+```
 
-4. **Run Smoke Tests**:
+**Run**:
 
-   ```bash
-   uv run pytest
-   ```
+```bash
+uv run python main.py
+```
 
-5. **Execute the Entry Point**:
+---
 
-   ```bash
-   uv run python main.py
-   ```
+## Developing ainit
+
+This repository (the CLI itself) uses `uv` + Ruff + Pytest. CI runs on every push/PR to `main`.
+
+```bash
+git clone https://github.com/mpraes/ainit.git
+cd ainit
+uv sync --extra dev
+
+uv run ruff check src tests
+uv run ruff format --check src tests
+uv run pytest
+```
+
+Local CLI against your checkout:
+
+```bash
+uv run ainit my_project
+# or
+PYTHONPATH=src python -m ainit.cli my_project
+```
+
+Releases: bump `version` in `pyproject.toml`, merge to `main`, then tag `vX.Y.Z` (see `.github/workflows/release.yml`).
 
 ---
 
 ## Contributing
 
-Contributions are very welcome! If you'd like to add new frameworks, vector stores, or template improvements:
-
-1. Fork the Repository.
-2. Create your Feature Branch (`git checkout -b feature/amazing-feature`).
-3. Commit your Changes (`git commit -m 'feat: add support for XYZ framework'`).
-4. Push to the Branch (`git push origin feature/amazing-feature`).
-5. Open a Pull Request.
+1. Fork and create a feature branch.
+2. Use `uv` for dependencies (`uv add` / `uv sync`) — not `pip`.
+3. Keep changes typed and covered by tests where practical.
+4. Run `uv run ruff check src tests`, `uv run ruff format src tests`, and `uv run pytest` before opening a PR.
+5. Open a Pull Request against `main`.
 
 ---
 
 ## License
 
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
+Distributed under the MIT License. See [`LICENSE`](LICENSE).
 
 Developed with ❤️ by **[@mpraes](https://github.com/mpraes)**.
