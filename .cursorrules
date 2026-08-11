@@ -1,0 +1,50 @@
+## Code style
+
+- Functions: 4-20 lines. Split if longer.
+- Files: under 500 lines. Split by responsibility.
+- One thing per function, one responsibility per module (SRP).
+- Names: specific and unique. Avoid `data`, `handler`, `Manager`.
+  Prefer names that return <5 grep hits in the codebase.
+- Types: explicit. No `Any`, no untyped functions. Prefer `TypedDict` / pydantic.
+- No code duplication. Extract shared logic into a function/module.
+- Early returns over nested ifs. Max 2 levels of indentation.
+- Exception messages must include the offending value and expected shape.
+
+## Comments
+
+- Keep your own comments. Don't strip them on refactor — they carry
+  intent and provenance.
+- Write WHY, not WHAT. Skip comments that restate the next line.
+- Docstrings on public functions: intent + one usage example.
+
+## Tests
+
+- Tests run with a single command: `uv run pytest`.
+- Lint/format with: `uv run ruff check .` and `uv run ruff format .`.
+- Every new function gets a test. Bug fixes get a regression test.
+- Mock external I/O (API, DB, filesystem, `subprocess`) with named fakes,
+  not inline stubs.
+- Tests must be F.I.R.S.T: fast, independent, repeatable,
+  self-validating, timely.
+
+## Dependencies
+
+- Always use `uv` (`uv add`, `uv run`, `uv sync`). Never `pip install`.
+- Inject dependencies through constructor/parameter when practical.
+- Wrap third-party libs behind a thin interface when they leak into
+  multiple modules.
+
+## Structure
+
+- Package lives under `src/ainit/`.
+- Prefer small focused modules over god files.
+- Predictable paths: `src/ainit/` for library code, `tests/` for tests.
+
+## Formatting
+
+- Use `ruff` for lint and format. Do not introduce Black.
+
+## Logging
+
+- Structured JSON when logging for debugging / observability.
+- Plain text only for user-facing CLI output (Rich is fine).
