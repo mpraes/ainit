@@ -23,7 +23,6 @@ dependencies = [
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
-    "black>=24.0.0",
     "ruff>=0.3.0",
 ]
 
@@ -32,3 +31,14 @@ ainit = "ainit.cli:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ainit"]
+
+[tool.ruff]
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
