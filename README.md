@@ -11,7 +11,7 @@
 
 ### Scaffold Production-Ready AI Agent Projects in Seconds
 
-[![PyPI - Version](https://img.shields.io/pypi/v/ai-init?style=for-the-badge&color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/ai-init/)
+[![PyPI - Version](https://img.shields.io/pypi/v/ai-init?style=for-the-badge&color=blue&logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/ai-init/)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Powered by uv](https://img.shields.io/badge/powered%20by-uv-de5b8a?style=for-the-badge&logo=astral&logoColor=white)](https://github.com/astral-sh/uv)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
